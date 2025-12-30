@@ -17,6 +17,7 @@ int main(int argc, char *argv[]) {
   opts.rows = opts.cols = 5;
   opts.win_len = 5;
   opts.max_moves = 0;
+  opts.playable_part = 0.66;
 
   ttt::my_player::MyPlayer p1("p1");
   ttt::my_player::MyPlayer p2("p2");

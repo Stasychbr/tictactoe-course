@@ -20,15 +20,46 @@ inline bool is_dq(MoveResult r) {
          r == MoveResult::DQ_PLACE_OCCUPIED;
 }
 
-enum class Sign { X, O, NONE };
+enum class Sign { 
+  NONE,
+  X,
+  O,
+  WALL,
+  ERROR
+};
+
+class Obstacle {
+  char* m_moves;
+  int m_left_size;
+  int m_right_size;
+  int m_up_size;
+  int m_down_size;
+public:
+  Obstacle(int seq_len);
+  Obstacle(const Obstacle& other) = delete;
+  Obstacle& operator=(const Obstacle& other) = delete;
+  int get_rsize() const {return m_right_size;}
+  int get_lsize() const {return m_left_size;}
+  int get_usize() const {return m_up_size;}
+  int get_dsize() const {return m_down_size;}
+  char get_move(int i) const {return m_moves[i];};
+  int get_moves_len() const;
+  ~Obstacle();
+};
 
 class FieldBitmap {
   char *m_bitmap;
   int m_rows;
   int m_cols;
+  float m_playable_part;
+  static const int m_max_obstacle_len = 5;
+
+  void set_unsafe(int x, int y, Sign s);
+  void find_obstacle_place(const Obstacle& obstacle, int& x, int& y);
+  int insert_obstacle(const Obstacle& obstacle, int x, int y);
 
 public:
-  FieldBitmap(int rows, int cols);
+  FieldBitmap(int rows, int cols, float playable_part);
   FieldBitmap(const FieldBitmap &other);
   FieldBitmap(FieldBitmap &&other);
   ~FieldBitmap();
@@ -37,7 +68,8 @@ public:
   FieldBitmap &operator=(FieldBitmap &&other);
 
   void set(int x, int y, Sign s);
-  void reset();
+  
+  void generate();
 
   Sign get(int x, int y) const;
   bool is_valid(int x, int y) const;
@@ -53,6 +85,7 @@ public:
     int cols;
     int win_len;
     int max_moves;
+    float playable_part;
   };
 
 private:

@@ -102,6 +102,7 @@ static TestResult run_game_tests(
     opts.rows = opts.cols = board_size;
     opts.win_len = win_length;
     opts.max_moves = 0;
+    opts.playable_part = 1.0;
     
     // Wrap players with time measurement
     TimeMeasuringPlayer tm_p1(p1), tm_p2(p2);

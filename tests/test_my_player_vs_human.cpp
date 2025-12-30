@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) {
   opts.rows = opts.cols = 15; 
   opts.win_len = 5; 
   opts.max_moves = 0;
+  opts.playable_part = 0.66;
 
   // auto p1 = new ttt::my_player::MyPlayer("MyAIPlayer");
   // auto p1 = ttt::baseline::get_harder_player("p_easy");

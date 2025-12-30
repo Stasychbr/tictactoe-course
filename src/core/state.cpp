@@ -2,13 +2,110 @@
 
 #include <algorithm>
 #include <cstring>
+#include <random>
 
 namespace ttt::game {
 
-FieldBitmap::FieldBitmap(int rows, int cols)
+Obstacle::Obstacle(int seq_len) {
+  m_left_size = m_right_size = m_down_size = m_up_size = 0;
+  m_moves = new char[seq_len + 1];
+  std::mt19937 rng(std::random_device{}());
+  /*
+    0 - UP (U)
+    1 - LEFT (L)
+    2 - DOWN (D)
+    3 - RIGHT (R)
+  */
+  std::uniform_int_distribution<int> dist(0, 3);
+  int prev_parity = -1;
+  int cur_x = 0;
+  int cur_y = 0;
+  for (int i = 0; i < seq_len; i++) {
+    int cur_number = dist(rng);
+    while (cur_number % 2 == prev_parity) { // to not make backward moves
+      cur_number = dist(rng);
+    }
+    switch (cur_number) {
+      case 0:
+        m_moves[i] = 'U';
+        cur_y++;
+        break;
+      case 1:
+        m_moves[i] = 'L';
+        cur_x--;
+        break;
+      case 2:
+        m_moves[i] = 'D';
+        cur_y--;
+        break;
+      case 3:
+        m_moves[i] = 'R';
+        cur_x++;
+        break;
+      default:
+        m_moves[i] = 0;
+    }
+    if (cur_x <= 0 && -cur_x > m_left_size) {
+      m_left_size = -cur_x;
+    }
+    if (cur_x >= 0 && cur_x > m_right_size) {
+      m_right_size = cur_x;
+    }
+    if (cur_y <= 0 && -cur_y > m_down_size) {
+      m_down_size = -cur_y;
+    }
+    if (cur_y >= 0 && cur_y > m_up_size) {
+      m_up_size = cur_y;
+    }
+    prev_parity = cur_number % 2;
+  }
+  m_moves[seq_len] = 0;
+}
+
+Obstacle::~Obstacle() {
+  delete[] m_moves;
+}
+
+int Obstacle::get_moves_len() const {
+  return strlen(m_moves);
+}
+
+int FieldBitmap::insert_obstacle(const Obstacle& obstacle, int x, int y) {
+  int i = 0;
+  char move = 0;
+  int cur_x = x;
+  int cur_y = y;
+  int inserted = 0;
+  while (move = obstacle.get_move(i++)) {
+    Sign cur_state = get(cur_x, cur_y);
+    if (cur_state != Sign::WALL) {
+      inserted++;
+    }
+    set_unsafe(cur_x, cur_y, Sign::WALL);
+    switch (move) {
+      case 'D':
+        cur_y--;
+        break;
+      case 'U':
+        cur_y++;
+        break;
+      case 'L':
+        cur_x--;
+        break;
+      case 'R':
+        cur_x++;
+        break;
+      default:
+        break;
+    }
+  }
+  return inserted;
+}
+
+FieldBitmap::FieldBitmap(int rows, int cols, float playable_part)
     : m_rows(rows), m_cols(cols), m_bitmap(0) {
   m_bitmap = new char[bitmap_size()];
-  reset();
+  generate();
 }
 
 FieldBitmap::FieldBitmap(const FieldBitmap &other) : m_bitmap(0) {
@@ -50,38 +147,85 @@ Sign FieldBitmap::get(int x, int y) const {
   const int bit_no = (x + y * m_cols) * 2;
   const int byte_no = bit_no / 8;
   const char value = (m_bitmap[byte_no] >> (bit_no % 8)) & 0b11;
-  switch (value) {
-  case 1:
-    return Sign::X;
-  case 2:
-    return Sign::O;
-  default:
-    return Sign::NONE;
+  if (value < 0 || value >= int(Sign::ERROR)) {
+    return Sign::ERROR;
   }
+  return static_cast<Sign>(value);
 }
 
 bool FieldBitmap::is_valid(int x, int y) const {
   return !(x < 0 || x >= m_cols || y < 0 || y >= m_rows);
 }
 
-void FieldBitmap::set(int x, int y, Sign s) {
-  if (!is_valid(x, y))
-    return;
+void FieldBitmap::set_unsafe(int x, int y, Sign s) {
   const int bit_no = (x + y * m_cols) * 2;
   const int offset = bit_no % 8;
   char &byte = m_bitmap[bit_no / 8];
   byte &= ~(0b11 << offset);
-  if (Sign::NONE == s)
-    return;
-  const int value = s == Sign::X ? 1 : 2;
+  const int value = static_cast<int>(s);
   byte |= value << offset;
 }
 
-void FieldBitmap::reset() { std::memset(m_bitmap, 0, bitmap_size()); }
+void FieldBitmap::set(int x, int y, Sign s) {
+  if (!is_valid(x, y) || !(s == Sign::X || s == Sign::O)) {
+    return;
+  }
+  set_unsafe(x, y, s);
+}
+
+void FieldBitmap::find_obstacle_place(const Obstacle& obstacle, int& x, int& y) {
+  for (int i = 0; i < m_rows; i++) {
+    for (int j = 0; j < m_cols; j++) {
+      int x_to_check = i - obstacle.get_lsize();
+      int y_to_check = j - obstacle.get_dsize();
+      bool f_fit = true;
+      while (f_fit && x_to_check < i + obstacle.get_rsize()) {
+        while (f_fit && y_to_check < j + obstacle.get_usize()) {
+          if (!is_valid(x_to_check, y_to_check) || get(x_to_check, y_to_check) == Sign::WALL) {
+            f_fit = false;
+          }
+          y_to_check++;
+        }
+        x_to_check++;
+      }
+      if (f_fit) {
+        x = i;
+        y = j;
+      }
+    }
+  }
+  x = -1;
+  y = -1;
+}
+
+void FieldBitmap::generate() { 
+  std::memset(m_bitmap, static_cast<int>(Sign::NONE), bitmap_size());
+  std::mt19937 rng(std::random_device{}());
+  std::uniform_int_distribution<int> dist(0, m_max_obstacle_len);
+  int wall_n = 0;
+  int tries_n = 0;
+  while (wall_n < m_cols * m_rows * (1.f - m_playable_part)) {
+    while (tries_n < m_max_obstacle_len) {
+      int cur_seq_len = dist(rng);
+      Obstacle obstacle(cur_seq_len);
+      int x = -1;
+      int y = -1;
+      find_obstacle_place(obstacle, x, y);
+      if (x >= 0 && y >= 0) {
+        insert_obstacle(obstacle, x, y);
+      }
+      tries_n++;
+    }
+    if (tries_n == m_max_obstacle_len) {
+      return;
+    }
+    tries_n = 0;
+  }
+}
 
 int FieldBitmap::bitmap_size() const { return (m_rows * m_cols * 2 + 7) / 8; }
 
-State::State(const Opts &opts) : m_opts(opts), m_field(opts.rows, opts.cols) {
+State::State(const Opts &opts) : m_opts(opts), m_field(opts.rows, opts.cols, opts.playable_part) {
   reset();
 }
 
@@ -90,7 +234,7 @@ void State::reset() {
   if (m_opts.max_moves == 0) {
     m_opts.max_moves = n_cells;
   }
-  m_field.reset();
+  m_field.generate();
   m_move_no = 0;
   m_player = Sign::X;
   m_status = Status::CREATED;
