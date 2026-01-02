@@ -14,10 +14,11 @@ int main(int argc, char *argv[]) {
   }
 
   ttt::game::State::Opts opts;
-  opts.rows = opts.cols = 5;
-  opts.win_len = 5;
+  opts.rows = opts.cols = 10;
+  opts.win_len = 10;
   opts.max_moves = 0;
   opts.playable_part = 0.66;
+  opts.max_obstacle_len = 3;
 
   ttt::my_player::MyPlayer p1("p1");
   ttt::my_player::MyPlayer p2("p2");
@@ -28,8 +29,9 @@ int main(int argc, char *argv[]) {
   game.add_player(ttt::game::Sign::O, &p2);
   game.add_observer(&obs);
 
-  std::cout << "\n";
+  obs.print_game_state(game.get_state());
   while (game.process() == ttt::game::MoveResult::OK) {
     obs.print_game_state(game.get_state());
   }
+  obs.print_game_state(game.get_state());
 }

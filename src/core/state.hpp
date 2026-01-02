@@ -52,14 +52,10 @@ class FieldBitmap {
   int m_rows;
   int m_cols;
   float m_playable_part;
-  static const int m_max_obstacle_len = 5;
-
-  void set_unsafe(int x, int y, Sign s);
-  void find_obstacle_place(const Obstacle& obstacle, int& x, int& y);
-  int insert_obstacle(const Obstacle& obstacle, int x, int y);
-
+  int m_wall_n;
+  int m_max_obstacle_len;
 public:
-  FieldBitmap(int rows, int cols, float playable_part);
+  FieldBitmap(int rows, int cols, float playable_part, int max_obstacle_len);
   FieldBitmap(const FieldBitmap &other);
   FieldBitmap(FieldBitmap &&other);
   ~FieldBitmap();
@@ -73,9 +69,13 @@ public:
 
   Sign get(int x, int y) const;
   bool is_valid(int x, int y) const;
+  int get_wall_cells_num() const {return m_wall_n;};
 
 private:
-  int bitmap_size() const;
+  int _bitmap_size() const;
+  void _set_unsafe(int x, int y, Sign s);
+  void _find_obstacle_place(const Obstacle& obstacle, int& x, int& y) const;
+  int _insert_obstacle(const Obstacle& obstacle, int x, int y, int max_len);
 };
 
 class State {
@@ -86,6 +86,7 @@ public:
     int win_len;
     int max_moves;
     float playable_part;
+    int max_obstacle_len;
   };
 
 private:
@@ -114,10 +115,12 @@ public:
 
   State &operator=(const State &state) = default;
 
+
 private:
   bool _valid_coords(int x, int y) const;
   void _set_value(int x, int y, Sign sign);
   Sign _opp_sign(Sign player);
   bool _is_winning(int x, int y);
+  void _empty_state();
 };
 }; // namespace ttt::game

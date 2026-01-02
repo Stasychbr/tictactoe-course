@@ -59,7 +59,7 @@ static const char *print_sign(Sign sign) {
     return "X";
   case Sign::O:
     return "O";
-  case Sign::NONE:
+  default:
     return "?";
   }
   return "";
