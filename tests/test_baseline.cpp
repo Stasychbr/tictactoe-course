@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
   opts.win_len = 5;
   opts.max_moves = 0;
   opts.playable_part = 0.66;
+  opts.max_obstacle_len = 3;
 
   ttt::game::IPlayer *p1 = new ttt::my_player::MyPlayer("MyPlayer");  // <~~ add your player here
   ttt::game::IPlayer *p2 = ttt::baseline::get_harder_player("p_easy");
