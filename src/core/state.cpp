@@ -22,7 +22,7 @@ Obstacle::Obstacle(int seq_len) {
   int cur_y = 0;
   for (int i = 0; i < seq_len; i++) {
     int cur_number = dist(rng);
-    while (cur_number % 2 == prev_number % 2 && cur_number != prev_number) { // to not make backward moves
+    while (cur_number % 2 == prev_number % 2) { // to not make backward moves
       cur_number = dist(rng);
     }
     switch (cur_number) {
@@ -150,13 +150,10 @@ FieldBitmap &FieldBitmap::operator=(FieldBitmap &&other) {
 
 Sign FieldBitmap::get(int x, int y) const {
   if (!is_valid(x, y))
-    return Sign::NONE;
+    return Sign::WALL;
   const int bit_no = (x + y * m_cols) * 2;
   const int byte_no = bit_no / 8;
   const char value = (m_bitmap[byte_no] >> (bit_no % 8)) & 0b11;
-  if (value < 0 || value >= int(Sign::ERROR)) {
-    return Sign::ERROR;
-  }
   return static_cast<Sign>(value);
 }
 
@@ -267,7 +264,7 @@ MoveResult State::process_move(Sign player, int x, int y) {
   if (m_status == Status::ENDED) {
     return MoveResult::ENDED;
   }
-  if (player == Sign::NONE) {
+  if (player == Sign::NONE || player == Sign::WALL) {
     return MoveResult::ERROR;
   }
   if (player != m_player) {
@@ -365,8 +362,8 @@ bool State::_is_winning(int x, int y) {
           has_wall = true;
           break;
         default:
-          fprintf(stderr, "ERROR: Unknown field value during event processing!\n");
-          return false;
+          // There was an error message here. It's gone now.
+          break;
         }
       }
       if (!has_none && !has_wall && (has_x && !has_o || has_o && !has_x)) {

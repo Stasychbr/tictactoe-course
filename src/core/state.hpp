@@ -24,8 +24,7 @@ enum class Sign {
   NONE,
   X,
   O,
-  WALL,
-  ERROR
+  WALL
 };
 
 class Obstacle {
