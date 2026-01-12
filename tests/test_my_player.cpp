@@ -17,14 +17,14 @@ int main(int argc, char *argv[]) {
   opts.rows = opts.cols = 10;
   opts.win_len = 10;
   opts.max_moves = 0;
-  opts.playable_part = 0.66;
-  opts.max_obstacle_len = 3;
+
+  auto field_initializer = ttt::game::ObstaclesFieldInitializer(0.66, 3);
 
   ttt::my_player::MyPlayer p1("p1");
   ttt::my_player::MyPlayer p2("p2");
   ttt::my_player::ConsoleWriter obs;
 
-  ttt::game::Game game(opts);
+  ttt::game::Game game(opts, &field_initializer);
   game.add_player(ttt::game::Sign::X, &p1);
   game.add_player(ttt::game::Sign::O, &p2);
   game.add_observer(&obs);

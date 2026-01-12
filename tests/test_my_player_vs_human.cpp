@@ -20,15 +20,15 @@ int main(int argc, char *argv[]) {
   opts.rows = opts.cols = 15; 
   opts.win_len = 5; 
   opts.max_moves = 0;
-  opts.playable_part = 0.66;
-  opts.max_obstacle_len = 3;
+
+  auto field_initializer = ttt::game::ObstaclesFieldInitializer(0.66, 3);
 
   // auto p1 = new ttt::my_player::MyPlayer("MyAIPlayer");
   // auto p1 = ttt::baseline::get_harder_player("p_easy");
   auto p1 = ttt::baseline::get_easy_player("p_easy");
   auto p2 = new ttt::human_player::HumanPlayer("human_player");
   ttt::my_player::ConsoleWriter obs;
-  ttt::game::Game game(opts);
+  ttt::game::Game game(opts, &field_initializer);
   game.add_player(ttt::game::Sign::X, p1);// если вы тестируете против базовых игроков, просто передайте указатель p1
 
   game.add_player(ttt::game::Sign::O, p2); 
