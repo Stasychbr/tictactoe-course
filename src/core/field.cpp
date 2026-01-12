@@ -83,7 +83,17 @@ int ObstaclesFieldInitializer::_insert_obstacle(const Obstacle& obstacle,
     if (cur_state != Sign::WALL) {
       inserted++;
     }
-    field.set(cur_x, cur_y, Sign::WALL);
+    for (int dx = -m_gap; dx <= m_gap; dx++) {
+      for (int dy = -m_gap; dy <= m_gap; dy++) {
+        if (dx == 0 && dy == 0) {
+          field.set(cur_x, cur_y, Sign::WALL);
+        }
+        else if (field.is_valid(cur_x + dx, cur_y + dy) &&
+          field.get(cur_x + dx, cur_y + dy) == Sign::NONE) {
+          field.set(cur_x + dx, cur_y + dy, Sign::X);
+        }
+      }
+    } 
     move = obstacle.get_move(i++);
     switch (move) {
       case 'D':
@@ -106,37 +116,48 @@ int ObstaclesFieldInitializer::_insert_obstacle(const Obstacle& obstacle,
 return inserted;
 }
 
-void ObstaclesFieldInitializer::_find_obstacle_place(const Obstacle& obstacle,
-    const FieldBitmap& field, int& x, int& y) {
-  std::mt19937 rng(std::random_device{}());
-  std::uniform_int_distribution<int> x_dist(0, field.get_cols());
-  std::uniform_int_distribution<int> y_dist(0, field.get_rows());
-  int x_start = x_dist(rng);
-  int y_start = y_dist(rng);
-  for (int i = y_start; i < field.get_rows(); i++) {
-    for (int j = x_start; j < field.get_cols(); j++) {
-      int x_to_check = j - obstacle.get_lsize();
-      int y_to_check = i - obstacle.get_dsize();
-      bool f_fit = true;
-      while (f_fit && x_to_check <= j + obstacle.get_rsize()) {
-        while (f_fit && y_to_check <= i + obstacle.get_usize()) {
-          if (!field.is_valid(x_to_check, y_to_check) || 
-          field.get(x_to_check, y_to_check) == Sign::WALL) {
-            f_fit = false;
-          }
-          y_to_check++;
-        }
-        x_to_check++;
-      }
-      if (f_fit) {
-        x = j;
-        y = i;
-        return;
+void ObstaclesFieldInitializer::_finalize_field(FieldBitmap& field) {
+  for (int i = 0; i < field.get_cols(); i++) {
+    for (int j = 0; j < field.get_rows(); j++) {
+      Sign sign = field.get(i, j);
+      if (sign != Sign::NONE && sign != Sign::WALL) {
+        field.set(i, j, Sign::NONE);
       }
     }
   }
-  x = -1;
-  y = -1;
+}
+
+void ObstaclesFieldInitializer::_find_obstacle_place(const Obstacle& obstacle,
+                                                     const FieldBitmap& field, int& x, int& y) {
+    std::mt19937 rng(std::random_device{}());
+    std::uniform_int_distribution<int> x_dist(0, field.get_cols());
+    std::uniform_int_distribution<int> y_dist(0, field.get_rows());
+    int x_start = x_dist(rng);
+    int y_start = y_dist(rng);
+    for (int i = y_start; i < field.get_rows(); i++) {
+        for (int j = x_start; j < field.get_cols(); j++) {
+            int x_to_check = j - obstacle.get_lsize();
+            int y_to_check = i - obstacle.get_dsize();
+            bool f_fit = true;
+            while (f_fit && x_to_check <= j + obstacle.get_rsize()) {
+                while (f_fit && y_to_check <= i + obstacle.get_usize()) {
+                    if (!field.is_valid(x_to_check, y_to_check) ||
+                        field.get(x_to_check, y_to_check) != Sign::NONE) {
+                        f_fit = false;
+                    }
+                    y_to_check++;
+                }
+                x_to_check++;
+            }
+            if (f_fit) {
+                x = j;
+                y = i;
+                return;
+            }
+        }
+    }
+    x = -1;
+    y = -1;
 }
 
 void ObstaclesFieldInitializer::initialize(FieldBitmap& field) {
@@ -159,9 +180,11 @@ void ObstaclesFieldInitializer::initialize(FieldBitmap& field) {
       tries_n++;
     }
     if (tries_n == m_max_obstacle_len + 1) {
+      _finalize_field(field);
       return;
     }
   }
+  _finalize_field(field);
 }
 
 void FieldBitmap::reset() {

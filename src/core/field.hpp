@@ -71,9 +71,10 @@ public:
 class ObstaclesFieldInitializer: public IFieldInitializer {
   float m_playable_part;
   int m_max_obstacle_len;
+  int m_gap;
 public:
-  ObstaclesFieldInitializer(float playable_part, int max_obstacle_len):
-  m_max_obstacle_len(max_obstacle_len), m_playable_part(playable_part) {};
+  ObstaclesFieldInitializer(float playable_part, int max_obstacle_len, int gap):
+  m_max_obstacle_len(max_obstacle_len), m_playable_part(playable_part), m_gap(gap) {};
   ObstaclesFieldInitializer(const ObstaclesFieldInitializer& other) = default;
   
   void initialize(FieldBitmap& field);
@@ -83,6 +84,7 @@ public:
 
   ~ObstaclesFieldInitializer() = default;
 private:
+  void _finalize_field(FieldBitmap& field);
   void _find_obstacle_place(const Obstacle& obstacle,
     const FieldBitmap& field, int& x, int& y);
   int _insert_obstacle(const Obstacle& obstacle,

@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
   opts.win_len = 10;
   opts.max_moves = 0;
 
-  auto field_initializer = ttt::game::ObstaclesFieldInitializer(0.66, 3);
+  auto field_initializer = ttt::game::ObstaclesFieldInitializer(0.66, 3, 1);
 
   ttt::my_player::MyPlayer p1("p1");
   ttt::my_player::MyPlayer p2("p2");

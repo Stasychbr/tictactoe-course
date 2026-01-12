@@ -97,14 +97,16 @@ static TestResult run_game_tests(
     int board_size = 15,
     int win_length = 5,
     float playable_part = 0.66,
-    int max_obstacle_len = 3) {
+    int max_obstacle_len = 3,
+    int obstacles_gap = 1) {
     
     //game options
     game::State::Opts opts;
     opts.rows = opts.cols = board_size;
     opts.win_len = win_length;
     opts.max_moves = 0;
-    auto field_initializer = ttt::game::ObstaclesFieldInitializer(playable_part, max_obstacle_len);
+    auto field_initializer = 
+      ttt::game::ObstaclesFieldInitializer(playable_part, max_obstacle_len, obstacles_gap);
     
     // Wrap players with time measurement
     TimeMeasuringPlayer tm_p1(p1), tm_p2(p2);
