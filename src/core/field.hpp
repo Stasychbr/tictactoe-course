@@ -11,6 +11,8 @@ class Obstacle {
   int m_up_size;
   int m_down_size;
 public:
+  static void move_point(int& x, int& y, char move);
+
   Obstacle(int seq_len);
   Obstacle(const Obstacle& other) = delete;
   Obstacle& operator=(const Obstacle& other) = delete;
@@ -86,7 +88,7 @@ public:
 private:
   void _finalize_field(FieldBitmap& field);
   void _find_obstacle_place(const Obstacle& obstacle,
-    const FieldBitmap& field, int& x, int& y);
+    const FieldBitmap& field, int& x, int& y, bool exhaustive);
   int _insert_obstacle(const Obstacle& obstacle,
     FieldBitmap& field, int x, int y, int max_len);
 };

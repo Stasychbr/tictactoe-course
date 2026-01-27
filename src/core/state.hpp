@@ -35,8 +35,6 @@ public:
     int cols;
     int win_len;
     int max_moves;
-    float playable_part;
-    int max_obstacle_len;
   };
 
 private:

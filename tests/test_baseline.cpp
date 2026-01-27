@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
   opts.win_len = 5;
   opts.max_moves = 0;
   
-  auto field_initializer = ttt::game::ObstaclesFieldInitializer(0.66, 3, 1);
+  auto field_initializer = ttt::game::ObstaclesFieldInitializer(0.66, 5, 1);
 
   ttt::game::IPlayer *p1 = new ttt::my_player::MyPlayer("MyPlayer");  // <~~ add your player here
   ttt::game::IPlayer *p2 = ttt::baseline::get_harder_player("p_easy");
