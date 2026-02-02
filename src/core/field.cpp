@@ -90,7 +90,7 @@ void ttt::game::Obstacle::move_point(int& x, int& y, char move) {
   }
 }
 
-int ObstaclesFieldInitializer::_insert_obstacle(const Obstacle& obstacle,
+int RandomObstaclesFI::_insert_obstacle(const Obstacle& obstacle,
     FieldBitmap& field, int x, int y, int max_len) {
   int i = 0;
   char move = 0;
@@ -122,7 +122,7 @@ int ObstaclesFieldInitializer::_insert_obstacle(const Obstacle& obstacle,
   return inserted;
 }
 
-void ObstaclesFieldInitializer::_finalize_field(FieldBitmap& field) {
+void RandomObstaclesFI::_finalize_field(FieldBitmap& field) {
   for (int i = 0; i < field.get_cols(); i++) {
     for (int j = 0; j < field.get_rows(); j++) {
       Sign sign = field.get(i, j);
@@ -133,7 +133,7 @@ void ObstaclesFieldInitializer::_finalize_field(FieldBitmap& field) {
   }
 }
 
-void ObstaclesFieldInitializer::_find_obstacle_place(const Obstacle& obstacle,
+void RandomObstaclesFI::_find_obstacle_place(const Obstacle& obstacle,
                                                      const FieldBitmap& field,
                                                      int& x, int& y, bool exhaustive) {
   int x_start = 0;
@@ -171,7 +171,7 @@ void ObstaclesFieldInitializer::_find_obstacle_place(const Obstacle& obstacle,
   y = -1;
 }
 
-void ObstaclesFieldInitializer::initialize(FieldBitmap& field) {
+void RandomObstaclesFI::initialize(FieldBitmap& field) {
   std::mt19937 rng(std::random_device{}());
   std::uniform_int_distribution<int> dist(0, m_max_obstacle_len);
   const int max_tries = int(sqrt(field.get_cols() * field.get_rows()));

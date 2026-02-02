@@ -70,21 +70,21 @@ public:
     ~DefaultFieldInitializer() = default;
 };
 
-class ObstaclesFieldInitializer: public IFieldInitializer {
+class RandomObstaclesFI: public IFieldInitializer {
   float m_playable_part;
   int m_max_obstacle_len;
   int m_gap;
 public:
-  ObstaclesFieldInitializer(float playable_part, int max_obstacle_len, int gap):
+  RandomObstaclesFI(float playable_part, int max_obstacle_len, int gap):
   m_max_obstacle_len(max_obstacle_len), m_playable_part(playable_part), m_gap(gap) {};
-  ObstaclesFieldInitializer(const ObstaclesFieldInitializer& other) = default;
+  RandomObstaclesFI(const RandomObstaclesFI& other) = default;
   
   void initialize(FieldBitmap& field);
   IFieldInitializer* clone() const {
-    return new ObstaclesFieldInitializer(*this);
+    return new RandomObstaclesFI(*this);
   }
 
-  ~ObstaclesFieldInitializer() = default;
+  ~RandomObstaclesFI() = default;
 private:
   void _finalize_field(FieldBitmap& field);
   void _find_obstacle_place(const Obstacle& obstacle,

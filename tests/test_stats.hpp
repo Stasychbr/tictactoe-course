@@ -106,7 +106,7 @@ static TestResult run_game_tests(
     opts.win_len = win_length;
     opts.max_moves = 0;
     auto field_initializer = 
-      ttt::game::ObstaclesFieldInitializer(playable_part, max_obstacle_len, obstacles_gap);
+      ttt::game::RandomObstaclesFI(playable_part, max_obstacle_len, obstacles_gap);
     
     // Wrap players with time measurement
     TimeMeasuringPlayer tm_p1(p1), tm_p2(p2);

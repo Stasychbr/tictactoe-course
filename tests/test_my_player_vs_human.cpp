@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   opts.win_len = 5; 
   opts.max_moves = 0;
 
-  auto field_initializer = ttt::game::ObstaclesFieldInitializer(0.66, 3, 1);
+  auto field_initializer = ttt::game::RandomObstaclesFI(0.66, 3, 1);
 
   // auto p1 = new ttt::my_player::MyPlayer("MyAIPlayer");
   // auto p1 = ttt::baseline::get_harder_player("p_easy");
