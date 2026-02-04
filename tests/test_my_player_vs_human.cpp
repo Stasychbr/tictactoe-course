@@ -17,13 +17,13 @@ int main(int argc, char *argv[]) {
   }
 
   ttt::game::State::Opts opts;
-  opts.rows = opts.cols = 15; 
+  opts.rows = opts.cols = 20; 
   opts.win_len = 5; 
   opts.max_moves = 0;
 
-  auto field_initializer = ttt::game::RandomObstaclesFI(0.66, 3, 1);
+  auto field_initializer = ttt::game::RandomObstaclesFI(0.75, 50, 1);
 
-  // auto p1 = new ttt::my_player::MyPlayer("MyAIPlayer");
+  // auto p1 = new ttt::my_player::MyPlayer("MyPlayer");
   // auto p1 = ttt::baseline::get_harder_player("p_easy");
   auto p1 = ttt::baseline::get_easy_player("p_easy");
   auto p2 = new ttt::human_player::HumanPlayer("human_player");

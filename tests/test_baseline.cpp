@@ -16,11 +16,11 @@ int main(int argc, char *argv[]) {
   }
 
   ttt::game::State::Opts opts;
-  opts.rows = opts.cols = 15;
+  opts.rows = opts.cols = 20;
   opts.win_len = 5;
   opts.max_moves = 0;
   
-  auto field_initializer = ttt::game::RandomObstaclesFI(0.66, 5, 1);
+  auto field_initializer = ttt::game::RandomObstaclesFI(0.75, 50, 1);
 
   ttt::game::IPlayer *p1 = new ttt::my_player::MyPlayer("MyPlayer");  // <~~ add your player here
   ttt::game::IPlayer *p2 = ttt::baseline::get_harder_player("p_easy");

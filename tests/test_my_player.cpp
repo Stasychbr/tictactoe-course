@@ -14,11 +14,11 @@ int main(int argc, char *argv[]) {
   }
 
   ttt::game::State::Opts opts;
-  opts.rows = opts.cols = 10;
-  opts.win_len = 10;
+  opts.rows = opts.cols = 20;
+  opts.win_len = 20;
   opts.max_moves = 0;
 
-  auto field_initializer = ttt::game::RandomObstaclesFI(0.66, 3, 1);
+  auto field_initializer = ttt::game::RandomObstaclesFI(0.75, 50, 1);
 
   ttt::my_player::MyPlayer p1("p1");
   ttt::my_player::MyPlayer p2("p2");
